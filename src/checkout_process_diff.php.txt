@@ -1,0 +1,24 @@
+
+@@ -1063,6 +1063,22 @@
+ 			include ('send_order.php');
+ 		}
+ 	}
++        elseif($_SESSION['payment']=="ukash"){
++            if (isset ($_GET['sellid']) && is_numeric($_GET['sellid'])) {
++                $sellid = $_GET['sellid'];
++                $transActionCode = file_get_contents(MODULE_PAYMENT_UKASH_CALLBACK_URL.'?sellid='.$sellid);
++                if($transActionCode == 0){
++                    $order_totals = $order_total_modules->apply_credit();
++                    include ('send_order.php');
++                    if(!is_null($_SESSION['cart'])){
++                        $_SESSION['cart']->reset(true);
++                    }
++                }else{
++                    xtc_redirect(xtc_href_link(FILENAME_CHECKOUT_PAYMENT, 'error_message=Your payment has not been confirmed yet by Ukash. Please check in your customer account if your order was confirmed by the backup confirmation system. If not please choose another payment method.', 'SSL'));
++                }
++            }
++        }
+ 	else
+ 	{
+ 		// NEW EMAIL configuration !
+@@ -1074,7 +1090,7 @@
